@@ -1,9 +1,90 @@
-export const ScatterPlot = (selection, data, xLabel, yLabel) => {
-  console.log(xLabel, yLabel);
+import { nonNumeric_col, getSplitdata } from './utils.js'
+
+let scatter_data;
+let split_data;
+
+const LabelSelector = (selection) => {
+  const menus = selection.selectAll('#menus').data([null]);
+  const menuDiv = menus.enter().append('div')
+    .attr('id', 'menus');
+  const xmenu = menuDiv.append('span')
+    .attr('id', 'x-menu');
+  menuDiv.append('text')
+    .text("  vs  ");
+  const ymenu = menuDiv.append('span')
+    .attr('id', 'y-menu');
+}
+
+const onXColumnClicked = column => {
+  scatter_data.xLabel = column;
+  renderScatter(scatter_data);
+};
+
+const onYColumnClicked = column => {
+  scatter_data.yLabel = column;
+  renderScatter(scatter_data);
+};
+
+const dropdownMenu = (selection, props) => {
+  const {
+    options,
+    onOptionClicked,
+    selectedOption
+  } = props;
+  
+  let select = selection.selectAll('select').data([null]);
+  select = select.enter().append('select')
+    .merge(select)
+      .on('change', function() {
+        onOptionClicked(this.value);
+      });
+  
+  let numericOptions = options.slice(1)
+      .filter(d => {
+        return !nonNumeric_col.includes(d);
+      })
+  const option = select.selectAll('option').data(numericOptions);
+  option.enter().append('option')
+    .merge(option)
+      .attr('value', d => d)
+      .property('selected', d => d === selectedOption)
+      .text(d => d);
+};
+
+const MenuConfig = () => {
+  // const svg = document.querySelector('#plot');
+  // const svgStyle = `
+  //   text-align: center;
+  // `;
+  // svg.style.cssText = svgStyle;
+
+  const menu = document.querySelector('#menus');
+  const menuStyle = `
+    font-size: 2.5em;
+    position: relative; left: 200px;
+  `;
+  menu.style.cssText = menuStyle;
+
+  const menuselect = document.querySelectorAll('#menus select');
+  const selectStyle = `
+    font-size: 2.5rem;
+  `;
+  menuselect.forEach(el => el.style.cssText = selectStyle);
+
+  const option = document.querySelectorAll('#menus select option');
+  const optionStyle = `
+    font-size: 1rem;
+  `;
+  option.forEach(el => el.style.cssText = optionStyle);
+}
+
+const ScatterPlot = (selection, xLabel, yLabel) => {
+  let data = split_data.data[split_data.cats[0]];
+  
   const width = +selection.attr('width');
   const height = +selection.attr('height');
 
-  const margin = { top: 30, right: 20, bottom: 170, left: 100 };
+  const margin = { top: 30, right: 20, bottom: 100, left: 100 };
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
@@ -16,7 +97,7 @@ export const ScatterPlot = (selection, data, xLabel, yLabel) => {
     
 
   const Scale = (column, axis) => d3.scaleLinear()
-    .domain(d3.extent(data, d => d[column]))
+    .domain(d3.extent(data, d => +d[column]))
     .range(axis==="x"?[0, innerWidth]:[innerHeight, 0])
     .nice();
   const xScale = Scale(xLabel, "x");
@@ -87,4 +168,41 @@ export const ScatterPlot = (selection, data, xLabel, yLabel) => {
       .attr('cx', d => xScale(d[xLabel]))
       .attr('cy', d => yScale(d[yLabel]))
       .attr('r', 10);
+}
+
+
+
+export const renderScatter = (props) => {
+  const {
+    selection,
+    data,
+    split_col,
+    xLabel,
+    yLabel
+  } = props;
+
+
+  if(scatter_data != props) {
+    scatter_data = props;
+    split_data = getSplitdata(data, split_col);
+  }
+
+  ScatterPlot(selection, xLabel, yLabel);
+  LabelSelector(selection.select(function() { return this.parentNode; }));
+
+  d3.select('#x-menu')
+    .call(dropdownMenu, {
+      options: data.columns,
+      onOptionClicked: onXColumnClicked,
+      selectedOption: xLabel
+    });
+  
+  d3.select('#y-menu')
+    .call(dropdownMenu, {
+      options: data.columns,
+      onOptionClicked: onYColumnClicked,
+      selectedOption: yLabel
+    });
+
+  MenuConfig();
 }

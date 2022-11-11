@@ -1,10 +1,12 @@
 import {DefaultDict, fn} from './utils.js'
-import { ScatterPlot } from './scatter.js'
+import { renderScatter } from './scatter.js'
+import { renderLineChart } from './linechart.js'
 
 let data;
 let columns;
 let Label = "id";
-const plot = d3.select('.scatter-plot');
+let plot_type = "line_chart";
+const plot = d3.select('.svg-plot');
 
 const get_id = () => {
   let input = document.getElementById("id").value;
@@ -52,8 +54,27 @@ const render = () => {
       onOptionClicked: onColumnClicked,
       selectedOption: Label
     });
+  
+  if(plot_type == "scatter") {
+    let scatter_data = {
+      selection: plot,
+      data: data,
+      split_col: 'track_genre',
+      xLabel: 'popularity',
+      yLabel: 'danceability'
+    };
+    renderScatter(scatter_data);
+  }
 
-  ScatterPlot(plot, data, 'popularity', 'danceability')
+  if(plot_type == "line_chart") {
+    let line_data = {
+      selection: plot,
+      data: data,
+      split_col: 'track_genre',
+      Label: 'loudness',
+    }
+    renderLineChart(line_data);
+  }
 
 }
 
@@ -72,12 +93,9 @@ const show_col = (col) => {
 d3.csv("archive/dataset.csv").then(loaddata => {
   data = loaddata;
   columns = data.columns.slice(1);
-  data = data.slice(0, 100);
-  console.log(typeof data);
-  console.log(data);
   render();
   // columns.forEach(col => {
   //   show_col(col);
-    // console.log(col);
+  //   console.log(col);
   // })
 })

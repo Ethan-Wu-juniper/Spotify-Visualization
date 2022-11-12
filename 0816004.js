@@ -1,11 +1,12 @@
-import {DefaultDict, fn} from './utils.js'
+import { DefaultDict, dropdownMenu, plot_types } from './utils.js'
 import { renderScatter } from './scatter.js'
 import { renderLineChart } from './linechart.js'
+import { renderRidgeline } from './ridgeline.js'
 
 let data;
 let columns;
 let Label = "id";
-let plot_type = "line_chart";
+let plot_type = "ridgeline";
 const plot = d3.select('.svg-plot');
 
 const get_id = () => {
@@ -18,41 +19,22 @@ const get_id = () => {
   console.log(out);
 }
 
-const dropdownMenu = (selection, props) => {
-  const {
-    options,
-    onOptionClicked,
-    selectedOption
-  } = props;
-  
-  let select = selection.selectAll('select').data([null]);
-  select = select.enter().append('select')
-    .merge(select)
-      .on('change', function() {
-        onOptionClicked(this.value);
-      });
-  
-  const option = select.selectAll('option').data(options);
-  option.enter().append('option')
-    .merge(option)
-      .attr('value', d => d)
-      .property('selected', d => d === selectedOption)
-      .text(d => d);
-};
-
 const onColumnClicked = column => {
-  Label = column;
-  // render();
-  show_col(column);
+  plot_type = column;
+  // const innerPlot = d3.select(".InnerPlot");
+  // innerPlot.selectAll("path").remove();
+  // plot.selectAll("*").remove();
+  d3.select("#plot").selectAll("div").remove();
+  render();
 };
 
 const render = () => {
 
   d3.select('#column')
     .call(dropdownMenu, {
-      options: columns,
+      options: plot_types,
       onOptionClicked: onColumnClicked,
-      selectedOption: Label
+      selectedOption: plot_type
     });
   
   if(plot_type == "scatter") {
@@ -66,14 +48,24 @@ const render = () => {
     renderScatter(scatter_data);
   }
 
-  if(plot_type == "line_chart") {
+  if(plot_type == "linechart") {
     let line_data = {
       selection: plot,
       data: data,
       split_col: 'track_genre',
-      Label: 'loudness',
+      Label: 'danceability',
     }
     renderLineChart(line_data);
+  }
+
+  if(plot_type == "ridgeline") {
+    let ridge_data = {
+      selection: plot,
+      data: data,
+      split_col: 'track_genre',
+      Label: 'acoustic'
+    }
+    renderRidgeline(ridge_data);
   }
 
 }

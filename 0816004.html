@@ -18,5 +18,13 @@
       <svg class="svg-plot" height="800" width="1500"></svg>
     </div>
     <script type="module" src="0816004.js"></script>
+    <script type="text/javascript">
+      let module = {};
+    </script>
+    <script type="module">
+      import { OnRangeChange } from './ridgeline.js';
+      module.OnRangeChange = OnRangeChange;
+    </script>
+    <!-- <script type="module" src="test.js"></script> -->
   </body>
 </html>

@@ -26,7 +26,30 @@ export function getSplitdata(input_data, split_col) {
   return {data, cats};
 }
 
-const nonNumeric_col = ["track_id", "artists", "album_name", "track_name", "track_genre", "time_signature", "explicit", "key", "mode"];
-const float_col = ["popularity", "danceability", "energy", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"]
+export const dropdownMenu = (selection, props) => {
+  const {
+    options,
+    onOptionClicked,
+    selectedOption
+  } = props;
+  
+  let select = selection.selectAll('select').data([null]);
+  select = select.enter().append('select')
+    .merge(select)
+      .on('change', function() {
+        onOptionClicked(this.value);
+      });
+  
+  const option = select.selectAll('option').data(options);
+  option.enter().append('option')
+    .merge(option)
+      .attr('value', d => d)
+      .property('selected', d => d === selectedOption)
+      .text(d => d);
+};
 
-export { nonNumeric_col, float_col };
+const nonNumeric_col = ["track_id", "artists", "album_name", "track_name", "track_genre", "time_signature", "explicit", "key", "mode"];
+const float_col = ["danceability", "energy", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"]
+const plot_types = ["scatter", "linechart", "ridgeline"]
+
+export { nonNumeric_col, float_col, plot_types };

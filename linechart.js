@@ -1,4 +1,4 @@
-import { getSplitdata, nonNumeric_col } from './utils.js'
+import { getSplitdata, dropdownMenu, float_col } from './utils.js'
 
 let line_data;
 let split_data;
@@ -17,8 +17,9 @@ const LineChart = (selection, xLabel) => {
 
   const InnerG = selection.selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
-    .attr('class', 'InnerPlot');
+    .merge(InnerG)
+      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      .attr('class', 'InnerPlot');
     
 
   const xScale = d3.scaleLinear()
@@ -33,7 +34,6 @@ const LineChart = (selection, xLabel) => {
   });
 
   LabelCount = LabelCount.sort((a,b) => a[0] - b[0]);
-  console.log(LabelCount);
   const yScale = d3.scaleLinear()
     .domain(d3.extent(LabelCount.map(d => d[1])))
     .range([innerHeight, 0])
@@ -48,39 +48,59 @@ const LineChart = (selection, xLabel) => {
       .attr('font-size', 20);
   }
 
+  const line = d3.line()
+    .x(d => xScale(d[0]))
+    .y(d => yScale(d[1]));
+
+  for(let label of float_col) {
+    if(label != xLabel)
+      InnerG.merge(InnerPlot).selectAll(`#${label}`).data([])
+        .exit().remove();
+  }
+
+  const DataLine = InnerG.merge(InnerPlot)
+    .selectAll(`#${xLabel}`).data([LabelCount]);
+  DataLine.enter().append('path')
+  .merge(DataLine)
+    .attr('stroke', 'blue')
+    .attr('stroke-width', 3)
+  .transition().duration(1000)
+    .attr('id', xLabel)
+    .attr('d', d => line(d))
+    .attr('stroke', 'blue')
+    .attr('stroke-width', 3)
+    .attr('fill', 'none')
+    .attr('transform', `translate(0, 0)`)
+    .attr('clip-path', null);
+
   const xAxis = d3.axisBottom(xScale)
     .tickSize(-innerHeight)
     .tickPadding(15);
-  const xAxisG = InnerG.select('.x-axis');
-  const xAxisGEnter = InnerPlot.append('g')
-    .attr('class', 'x-axis');
-  xAxisG.merge(xAxisGEnter)
+  const xAxisG = InnerG.merge(InnerPlot)
+    .selectAll(".x-axis").data([null]);
+  xAxisG.enter().append('g')
+  .merge(xAxisG)
+    .attr('class', 'x-axis')
     .call(xAxis)
     .attr('transform', `translate(0, ${innerHeight})`)
-    .call(lineConfig);
+    .call(lineConfig)
+    .attr('clip-path', null);
 
   const yAxis = d3.axisLeft(yScale)
     .tickSize(-innerWidth)
     .tickPadding(15);
-  const yAxisG = InnerG.select('.y-axis');
-  const yAxisGEnter = InnerPlot.append('g')
-    .attr('class', 'y-axis');
-  yAxisG.merge(yAxisGEnter)
+  const yAxisG = InnerG.merge(InnerPlot)
+    .selectAll(".y-axis").data([null]);
+  const yAxisEl = yAxisG.enter().append('g')
+  .merge(yAxisG)
+    .attr('class', 'y-axis')
     .call(yAxis)
     .call(lineConfig);
 
-  // const xLabelText = xAxisGEnter.append('text')
-  // .merge(xAxisG.select('.axis-label'))
-  //   .attr('class', 'axis-label')
-  //   .attr('text-anchor', 'middle')
-  //   .attr('fill', 'black')
-  //   .attr('font-size', 30)
-  //   .attr('y', 60)
-  //   .attr('x', innerWidth / 2)
-  //   .text(xLabel);
-
-  const yLabelText = yAxisGEnter.append('text')
-  .merge(yAxisG.select('.axis-label'))
+  const yLabelText = yAxisEl
+    .selectAll('.axis-label').data([null]);
+  yLabelText.enter().append('text')
+  .merge(yLabelText)
     .attr('class', 'axis-label')
     .attr('text-anchor', 'middle')
     .attr('fill', 'black')
@@ -89,20 +109,6 @@ const LineChart = (selection, xLabel) => {
     .attr('y', -70)
     .attr('x', -innerHeight / 2)
     .text('Count');
-
-  const line = d3.line()
-    .x(d => xScale(d[0]))
-    .y(d => yScale(d[1]));
-
-  console.log(line(LabelCount));
-  const DataLine = InnerG.merge(InnerPlot)
-    .selectAll('path').data([LabelCount]);
-  DataLine.enter().append('path')
-  .merge(DataLine)
-    .attr('d', d => line(d))
-    .attr('stroke', 'blue')
-    .attr('stroke-width', 3)
-    .attr('fill', 'none');
 }
 
 const LabelSelector = (selection) => {
@@ -116,32 +122,6 @@ const LabelSelector = (selection) => {
 const onColumnClicked = column => {
   line_data.Label = column;
   renderLineChart(line_data);
-};
-
-const dropdownMenu = (selection, props) => {
-  const {
-    options,
-    onOptionClicked,
-    selectedOption
-  } = props;
-  
-  let select = selection.selectAll('select').data([null]);
-  select = select.enter().append('select')
-    .merge(select)
-      .on('change', function() {
-        onOptionClicked(this.value);
-      });
-  
-  let numericOptions = options.slice(1)
-      .filter(d => {
-        return !nonNumeric_col.includes(d);
-      })
-  const option = select.selectAll('option').data(numericOptions);
-  option.enter().append('option')
-    .merge(option)
-      .attr('value', d => d)
-      .property('selected', d => d === selectedOption)
-      .text(d => d);
 };
 
 const MenuConfig = () => {
@@ -183,7 +163,10 @@ export const renderLineChart = (props) => {
 
   d3.select('#x-menu')
     .call(dropdownMenu, {
-      options: data.columns,
+      options: data.columns.slice(1)
+        .filter(d => {
+          return float_col.includes(d);
+        }),
       onOptionClicked: onColumnClicked,
       selectedOption: Label
     });

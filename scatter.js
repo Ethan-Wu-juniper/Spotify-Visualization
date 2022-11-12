@@ -1,4 +1,4 @@
-import { nonNumeric_col, getSplitdata } from './utils.js'
+import { nonNumeric_col, getSplitdata, dropdownMenu } from './utils.js'
 
 let scatter_data;
 let split_data;
@@ -23,32 +23,6 @@ const onXColumnClicked = column => {
 const onYColumnClicked = column => {
   scatter_data.yLabel = column;
   renderScatter(scatter_data);
-};
-
-const dropdownMenu = (selection, props) => {
-  const {
-    options,
-    onOptionClicked,
-    selectedOption
-  } = props;
-  
-  let select = selection.selectAll('select').data([null]);
-  select = select.enter().append('select')
-    .merge(select)
-      .on('change', function() {
-        onOptionClicked(this.value);
-      });
-  
-  let numericOptions = options.slice(1)
-      .filter(d => {
-        return !nonNumeric_col.includes(d);
-      })
-  const option = select.selectAll('option').data(numericOptions);
-  option.enter().append('option')
-    .merge(option)
-      .attr('value', d => d)
-      .property('selected', d => d === selectedOption)
-      .text(d => d);
 };
 
 const MenuConfig = () => {
@@ -92,8 +66,9 @@ const ScatterPlot = (selection, xLabel, yLabel) => {
 
   const InnerG = selection.selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
-    .attr('class', 'InnerPlot');
+    .merge(InnerG)
+      .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      .attr('class', 'InnerPlot');
     
 
   const Scale = (column, axis) => d3.scaleLinear()
@@ -190,16 +165,21 @@ export const renderScatter = (props) => {
   ScatterPlot(selection, xLabel, yLabel);
   LabelSelector(selection.select(function() { return this.parentNode; }));
 
+  let numericOptions = data.columns.slice(1)
+      .filter(d => {
+        return !nonNumeric_col.includes(d);
+      })
+
   d3.select('#x-menu')
     .call(dropdownMenu, {
-      options: data.columns,
+      options: numericOptions,
       onOptionClicked: onXColumnClicked,
       selectedOption: xLabel
     });
   
   d3.select('#y-menu')
     .call(dropdownMenu, {
-      options: data.columns,
+      options: numericOptions,
       onOptionClicked: onYColumnClicked,
       selectedOption: yLabel
     });

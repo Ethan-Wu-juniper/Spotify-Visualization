@@ -4,6 +4,7 @@
     <title>Hw2</title>
     <link rel="stylesheet" href="0816004.css">
     <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
+    <!-- <script type="module" src="https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"></script> -->
   </header>
   <body>
 
@@ -23,7 +24,9 @@
     </script>
     <script type="module">
       import { OnRangeChange } from './ridgeline.js';
+      import { ReleaseLinechart } from './linechart.js'
       module.OnRangeChange = OnRangeChange;
+      module.ReleaseLinechart = ReleaseLinechart;
     </script>
     <!-- <script type="module" src="test.js"></script> -->
   </body>

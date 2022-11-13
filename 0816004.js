@@ -53,6 +53,7 @@ const render = () => {
       selection: plot,
       data: data,
       split_col: 'track_genre',
+      cur_col: 'acoustic',
       Label: 'danceability',
     }
     renderLineChart(line_data);

@@ -48,6 +48,16 @@ export const dropdownMenu = (selection, props) => {
       .text(d => d);
 };
 
+export const getLabelCount = (data, Label) => {
+  const LabelGroup = d3.group(data, d => d[Label]);
+  let LabelCount = [];
+  Array.from(LabelGroup, (key, value) => {
+    LabelCount.push([+key[0], key[1].length]);
+  });
+
+  return LabelCount.sort((a,b) => a[0] - b[0]);
+}
+
 const nonNumeric_col = ["track_id", "artists", "album_name", "track_name", "track_genre", "time_signature", "explicit", "key", "mode"];
 const float_col = ["danceability", "energy", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"]
 const plot_types = ["scatter", "linechart", "ridgeline"]

@@ -1,10 +1,12 @@
-import { getSplitdata, dropdownMenu, float_col } from './utils.js'
+import { renderRidgeline } from './ridgeline.js';
+import { getSplitdata, dropdownMenu, float_col, getLabelCount } from './utils.js'
 
 let line_data;
 let split_data;
 
 const LineChart = (selection, xLabel) => {
-  let data = split_data.data[split_data.cats[0]];
+  console.log(line_data.cur_col);
+  let data = split_data.data[line_data.cur_col];
   
   const width = +selection.attr('width');
   const height = +selection.attr('height');
@@ -27,13 +29,7 @@ const LineChart = (selection, xLabel) => {
     .range([0, innerWidth])
     .nice();
 
-  const LabelGroup = d3.group(data, d => d[xLabel]);
-  let LabelCount = [];
-  Array.from(LabelGroup, (key, value) => {
-    LabelCount.push([+key[0], key[1].length]);
-  });
-
-  LabelCount = LabelCount.sort((a,b) => a[0] - b[0]);
+  let LabelCount = getLabelCount(data, xLabel);
   const yScale = d3.scaleLinear()
     .domain(d3.extent(LabelCount.map(d => d[1])))
     .range([innerHeight, 0])
@@ -52,20 +48,22 @@ const LineChart = (selection, xLabel) => {
     .x(d => xScale(d[0]))
     .y(d => yScale(d[1]));
 
-  for(let label of float_col) {
-    if(label != xLabel)
-      InnerG.merge(InnerPlot).selectAll(`#${label}`).data([])
-        .exit().remove();
-  }
+  // for(let label of float_col) {
+  //   if(label != xLabel)
+  //     InnerG.merge(InnerPlot).selectAll(`#${label}`).data([])
+  //       .exit().remove();
+  // }
 
+  // const DataLine = InnerG.merge(InnerPlot)
+  //   .selectAll(`#${xLabel}`).data([LabelCount]);
+
+  InnerG.merge(InnerPlot).selectAll('path').data([])
+        .exit().remove();
   const DataLine = InnerG.merge(InnerPlot)
-    .selectAll(`#${xLabel}`).data([LabelCount]);
+    .selectAll('path').data([LabelCount]);
   DataLine.enter().append('path')
   .merge(DataLine)
-    .attr('stroke', 'blue')
-    .attr('stroke-width', 3)
-  .transition().duration(1000)
-    .attr('id', xLabel)
+    // .attr('id', xLabel)
     .attr('d', d => line(d))
     .attr('stroke', 'blue')
     .attr('stroke-width', 3)
@@ -82,8 +80,8 @@ const LineChart = (selection, xLabel) => {
   .merge(xAxisG)
     .attr('class', 'x-axis')
     .call(xAxis)
-    .attr('transform', `translate(0, ${innerHeight})`)
     .call(lineConfig)
+    .attr('transform', `translate(0, ${innerHeight})`)
     .attr('clip-path', null);
 
   const yAxis = d3.axisLeft(yScale)
@@ -111,12 +109,31 @@ const LineChart = (selection, xLabel) => {
     .text('Count');
 }
 
+export const ReleaseLinechart = () => {
+  let ridge_data = {
+    selection: line_data.selection,
+    data: line_data.data,
+    split_col: line_data.split_col,
+    Label: line_data.cur_col,
+  }
+  d3.select("#plot").selectAll("div").remove();
+  d3.selectAll('path').remove();
+  renderRidgeline(ridge_data);
+}
+
 const LabelSelector = (selection) => {
   const menus = selection.selectAll('#menus').data([null]);
   const menuDiv = menus.enter().append('div')
     .attr('id', 'menus');
+  menuDiv.append('label')
+    .text(`on ${line_data.split_col} - ${line_data.cur_col} : `)
   const xmenu = menuDiv.append('span')
     .attr('id', 'x-menu');
+  menuDiv.append('button')
+    .attr('id', 'release')
+    .attr('onclick', 'module.ReleaseLinechart()')
+    .attr('style', 'position: relative; left: 20px; font-size: 1.5rem;')
+    .text('Release');
 }
 
 const onColumnClicked = column => {
@@ -128,7 +145,7 @@ const MenuConfig = () => {
   const menu = document.querySelector('#menus');
   const menuStyle = `
     font-size: 2.5em;
-    position: relative; left: 650px;
+    position: relative; left: 450px;
   `;
   menu.style.cssText = menuStyle;
 
@@ -150,6 +167,7 @@ export const renderLineChart = (props) => {
     selection,
     data,
     split_col,
+    cur_col,
     Label
   } = props;
 

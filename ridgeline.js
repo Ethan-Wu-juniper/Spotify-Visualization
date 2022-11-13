@@ -1,4 +1,6 @@
-import { getSplitdata, float_col, dropdownMenu } from './utils.js'
+import { getSplitdata, float_col, dropdownMenu, getLabelCount } from './utils.js'
+import { renderLineChart } from './linechart.js'
+// import { interpolatePath } from "https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"
 
 let ridge_data;
 let split_data;
@@ -38,8 +40,8 @@ const Ridgeline = (selection, Label) => {
 
   const offset = {left : -300, right : 0};
   const xScale = d3.scaleLinear()
-    .domain([-1,2])
-    .range([-innerWidth, innerWidth * 2])
+    .domain([0,1])
+    .range([0, innerWidth])
     .nice();
 
   const yScale = d3.scaleBand()
@@ -47,21 +49,7 @@ const Ridgeline = (selection, Label) => {
     .range([0, innerHeight])
     .paddingInner(1);
 
-  let GroupCount = {};
-  for(let category of categories) {
-    let LabelGroup = d3.group(data, d => d[category]);
-    let LabelCount = [];
-    Array.from(LabelGroup, (key, value) => {
-      LabelCount.push([+key[0], key[1].length]);
-    });
 
-    LabelCount = LabelCount.sort((a,b) => a[0] - b[0]);
-    GroupCount[category] = LabelCount;
-  }
-  // const GetCountScale = (cat) => d3.scaleLinear()
-  //   .domain(d3.extent(GroupCount[cat].map(d => d[1])))
-  //   .range([innerHeight, 0])
-  //   .nice();
 
   let kde = kernelDensityEstimator(kernelEpanechnikov(0.5), xScale.ticks(40))
   let allDensity = []
@@ -97,22 +85,64 @@ const Ridgeline = (selection, Label) => {
     .domain([0, 10])
     .range([ innerHeight, 0]);
 
-  const line = d3.line()
+  // let GroupCount = {};
+  // for(let category of categories) {
+  //   let LabelCount = getLabelCount(data, category);
+  //   GroupCount[category] = LabelCount;
+  // }
+  // const getLine = (category) => {
+  //   d3.line()
+  //     .x(d => d3.scaleLinear()
+  //       .domain(d3.extent(data, d => +d[category]))
+  //       .range([0, innerWidth])
+  //       .nice()(d[0])
+  //     )
+  //     .y(d => d3.scaleLinear()
+  //       .domain(d3.extent(GroupCount[category].map(d => d[1])))
+  //       .range([innerHeight, 0])
+  //       .nice()(d[1])
+  //     )(GroupCount[category])
+  // };
+
+  const area = d3.area()
     .curve(d3.curveBasis)
     .x(function(d) { return xScale(d[0]); })
-    .y(function(d) { return yDensityScale(d[1]); });
+    .y0(function(d) { return yDensityScale(0); })
+    .y1(function(d) { return yDensityScale(d[1]); });
+
+  const PathMouseEvent = (element) => {
+    element.on('click', function(_, d) {
+      let selected_id = d3.select(this).text();
+      let line_data = {
+        selection: ridge_data.selection,
+        data: ridge_data.data,
+        split_col: ridge_data.split_col,
+        cur_col: ridge_data.Label,
+        Label: selected_id,
+      }
+      d3.select("#plot").selectAll("div").remove();
+      document.body.style.cursor = "default";
+      renderLineChart(line_data);
+    })
+    .on("mouseover", function(_, d) {
+      document.body.style.cursor = "pointer";
+    })
+    .on("mouseout", function(_, d) {
+      document.body.style.cursor = "default";
+    });
+  }
 
   for(let density of allDensity) { 
     const DataLine = InnerG.merge(InnerPlot)
       .selectAll(`#${density.key}`).data([density]);
-    DataLine.enter().append("path")
+    let path = DataLine.enter().append("path")
         .attr("transform", d => {
           return("translate(0," + (yScale(d.key)-innerHeight) +")" )
         })
         .attr("stroke", "blue")
         .attr("stroke-width", 1)
       .merge(DataLine)
-      .transition().duration(1000)
+      .transition().duration(300)
         .attr("id", d => d.key)
         .attr("class", "dataline")
         .attr("transform", d => {
@@ -121,8 +151,8 @@ const Ridgeline = (selection, Label) => {
         .attr("fill", "#69b3a2")
         .attr("stroke", "blue")
         .attr("stroke-width", 1)
-        .attr("d", d => line(d.density))
-        .attr('clip-path', 'url(#clip-left)');
+        .attr("d", d => area(d.density));
+        // .attr("d", d => interpolatePath(area(d.density), getLine(d.key))(0));
   }
 
   const xAxis = d3.axisBottom(xScale)
@@ -135,7 +165,6 @@ const Ridgeline = (selection, Label) => {
     .call(xAxis)
     .attr('transform', `translate(0, ${innerHeight})`)
     .call(lineConfig)
-    .attr('clip-path', 'url(#clip-left)')
   .selectAll('text')
     .attr('transform', `translate(-15, 0)`);
 
@@ -149,7 +178,9 @@ const Ridgeline = (selection, Label) => {
     .attr('class', 'y-axis')
     .call(yAxis)
     .attr('transform', `translate(${xScale(0)}, 0)`)
-    .call(lineConfig);
+    .call(lineConfig)
+  .selectAll('text')
+    .call(PathMouseEvent);
 
   d3.selectAll('.axis-label').remove();
 
@@ -178,7 +209,7 @@ const LabelSelector = (selection) => {
     .attr('id', 'label-range')
     .attr('type', 'range')
     .attr('min', 0)
-    .attr('max', 113)
+    .attr('max', Object.keys(split_data.data).length-1)
     .attr('value', 0)
     .attr('style', 'position: relative; left: 20px;')
     .attr('oninput', 'module.OnRangeChange(this.value)');

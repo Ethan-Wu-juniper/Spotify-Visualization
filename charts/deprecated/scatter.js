@@ -1,4 +1,4 @@
-import { nonNumeric_col, getSplitdata, dropdownMenu } from './utils.js'
+import { nonNumeric_col, getSplitdata, dropdownMenu } from '../../utils.js'
 
 let scatter_data;
 let split_data;

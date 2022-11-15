@@ -60,6 +60,6 @@ export const getLabelCount = (data, Label) => {
 
 const nonNumeric_col = ["track_id", "artists", "album_name", "track_name", "track_genre", "time_signature", "explicit", "key", "mode"];
 const float_col = ["danceability", "energy", "speechiness", "acousticness", "instrumentalness", "liveness", "valence"]
-const plot_types = ["scatter", "linechart", "ridgeline"]
+const plot_types = ["barchart", "ridgeline"]
 
 export { nonNumeric_col, float_col, plot_types };

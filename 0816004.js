@@ -1,7 +1,8 @@
 import { DefaultDict, dropdownMenu, plot_types } from './utils.js'
-import { renderScatter } from './scatter.js'
-import { renderLineChart } from './linechart.js'
-import { renderRidgeline } from './ridgeline.js'
+// import { renderScatter } from './charts/deprecated/scatter.js'
+// import { renderLineChart } from './charts/deprecated/linechart.js'
+import { renderRidgeline } from './charts/ridgeline.js'
+import { renderBarChart } from './charts/barchart.js'
 
 let data;
 let columns;
@@ -23,7 +24,7 @@ const onColumnClicked = column => {
   plot_type = column;
   // const innerPlot = d3.select(".InnerPlot");
   // innerPlot.selectAll("path").remove();
-  // plot.selectAll("*").remove();
+  plot.selectAll("*").remove();
   d3.select("#plot").selectAll("div").remove();
   render();
 };
@@ -37,26 +38,37 @@ const render = () => {
       selectedOption: plot_type
     });
   
-  if(plot_type == "scatter") {
-    let scatter_data = {
-      selection: plot,
-      data: data,
-      split_col: 'track_genre',
-      xLabel: 'popularity',
-      yLabel: 'danceability'
-    };
-    renderScatter(scatter_data);
-  }
+  // if(plot_type == "scatter") {
+  //   let scatter_data = {
+  //     selection: plot,
+  //     data: data,
+  //     split_col: 'track_genre',
+  //     xLabel: 'popularity',
+  //     yLabel: 'danceability'
+  //   };
+  //   renderScatter(scatter_data);
+  // }
 
-  if(plot_type == "linechart") {
-    let line_data = {
+  // if(plot_type == "linechart") {
+  //   let line_data = {
+  //     selection: plot,
+  //     data: data,
+  //     split_col: 'track_genre',
+  //     cur_col: 'acoustic',
+  //     Label: 'danceability',
+  //   }
+  //   renderLineChart(line_data);
+  // }
+
+  if(plot_type == "barchart") {
+    let bar_data = {
       selection: plot,
       data: data,
       split_col: 'track_genre',
       cur_col: 'acoustic',
       Label: 'danceability',
     }
-    renderLineChart(line_data);
+    renderBarChart(bar_data);
   }
 
   if(plot_type == "ridgeline") {

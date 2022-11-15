@@ -1,5 +1,5 @@
-import { getSplitdata, float_col, dropdownMenu, getLabelCount } from './utils.js'
-import { renderLineChart } from './linechart.js'
+import { getSplitdata, float_col, dropdownMenu, getLabelCount } from '../utils.js'
+import { renderBarChart } from './barchart.js'
 // import { interpolatePath } from "https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"
 
 let ridge_data;
@@ -113,7 +113,9 @@ const Ridgeline = (selection, Label) => {
   const PathMouseEvent = (element) => {
     element.on('click', function(_, d) {
       let selected_id = d3.select(this).text();
-      let line_data = {
+      if(selected_id == '')
+        selected_id = d3.select(this).attr('id');
+      let bar_data = {
         selection: ridge_data.selection,
         data: ridge_data.data,
         split_col: ridge_data.split_col,
@@ -121,13 +123,16 @@ const Ridgeline = (selection, Label) => {
         Label: selected_id,
       }
       d3.select("#plot").selectAll("div").remove();
+      d3.select('.InnerPlot').selectAll("*").remove();
       document.body.style.cursor = "default";
-      renderLineChart(line_data);
+      renderBarChart(bar_data);
     })
     .on("mouseover", function(_, d) {
+      d3.select(this).attr('opacity', 0.85);
       document.body.style.cursor = "pointer";
     })
     .on("mouseout", function(_, d) {
+      d3.select(this).attr('opacity', 1);
       document.body.style.cursor = "default";
     });
   }
@@ -141,6 +146,7 @@ const Ridgeline = (selection, Label) => {
         })
         .attr("stroke", "blue")
         .attr("stroke-width", 1)
+        .call(PathMouseEvent)
       .merge(DataLine)
       .transition().duration(300)
         .attr("id", d => d.key)

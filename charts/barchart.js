@@ -1,12 +1,11 @@
 import { renderRidgeline } from './ridgeline.js';
-import { getSplitdata, dropdownMenu, float_col, getLabelCount } from './utils.js'
+import { getSplitdata, dropdownMenu, float_col, getLabelCount } from '../utils.js'
 
-let line_data;
+// let chart_data.bar_data;
 let split_data;
 
-const LineChart = (selection, xLabel) => {
-  console.log(line_data.cur_col);
-  let data = split_data.data[line_data.cur_col];
+const BarChart = (selection, xLabel) => {
+  let data = split_data.data[chart_data.bar_data.cur_col];
   
   const width = +selection.attr('width');
   const height = +selection.attr('height');
@@ -22,18 +21,25 @@ const LineChart = (selection, xLabel) => {
     .merge(InnerG)
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
       .attr('class', 'InnerPlot');
-    
+
+  let histogram = d3.histogram()
+    .value(d => d)
+    .domain([0,1])
+    .thresholds(10);
+  
+  let hisData = histogram(data.map(d => d[xLabel]));
 
   const xScale = d3.scaleLinear()
-    .domain(d3.extent(data, d => +d[xLabel]))
+    .domain([0,1])
     .range([0, innerWidth])
     .nice();
 
-  let LabelCount = getLabelCount(data, xLabel);
   const yScale = d3.scaleLinear()
-    .domain(d3.extent(LabelCount.map(d => d[1])))
+    .domain([0,1000])
     .range([innerHeight, 0])
     .nice();
+
+  
 
   const lineConfig = AxisG => {
     AxisG.selectAll('.domain').remove();
@@ -43,33 +49,6 @@ const LineChart = (selection, xLabel) => {
     AxisG.selectAll('text')
       .attr('font-size', 20);
   }
-
-  const line = d3.line()
-    .x(d => xScale(d[0]))
-    .y(d => yScale(d[1]));
-
-  // for(let label of float_col) {
-  //   if(label != xLabel)
-  //     InnerG.merge(InnerPlot).selectAll(`#${label}`).data([])
-  //       .exit().remove();
-  // }
-
-  // const DataLine = InnerG.merge(InnerPlot)
-  //   .selectAll(`#${xLabel}`).data([LabelCount]);
-
-  InnerG.merge(InnerPlot).selectAll('path').data([])
-        .exit().remove();
-  const DataLine = InnerG.merge(InnerPlot)
-    .selectAll('path').data([LabelCount]);
-  DataLine.enter().append('path')
-  .merge(DataLine)
-    // .attr('id', xLabel)
-    .attr('d', d => line(d))
-    .attr('stroke', 'blue')
-    .attr('stroke-width', 3)
-    .attr('fill', 'none')
-    .attr('transform', `translate(0, 0)`)
-    .attr('clip-path', null);
 
   const xAxis = d3.axisBottom(xScale)
     .tickSize(-innerHeight)
@@ -107,17 +86,74 @@ const LineChart = (selection, xLabel) => {
     .attr('y', -70)
     .attr('x', -innerHeight / 2)
     .text('Count');
+
+  const show_amount = (info, mouseX, mouseY) => {
+    const InfoG = InnerG.merge(InnerPlot)
+      .selectAll('#info-rect').data([null])
+    const InfoEnter = InfoG.enter().append('g')
+      .merge(InfoG)
+      .attr('id', 'info-rect')
+      .attr('transform', `translate(${mouseX}, ${mouseY})`)
+
+    const rect_size = {x: -130, y: -120, width: 100, height: 50}
+    const InfoRect = InfoEnter.merge(InfoG)
+      .selectAll('rect').data([null]);
+    InfoRect.enter().append('rect')
+      .merge(InfoRect)
+      .attr('x', rect_size.x)
+      .attr('y', rect_size.y)
+      .attr('width', rect_size.width)
+      .attr('height', rect_size.height)
+      .attr('stroke-width', 2)
+      .attr('opacity', 0.5);
+    const InfoText = InfoEnter.merge(InfoG)
+      .selectAll('text').data([null]);
+    InfoText.enter().append('text')
+      .merge(InfoText)
+      .attr('x', rect_size.x + rect_size.width/2)
+      .attr('y', rect_size.y + rect_size.height/2)
+      .attr('font-size', 30)
+      .style("text-anchor", "middle")
+      .style("alignment-baseline", "central")
+      .style('fill', 'white')
+      .text(info);
+  }
+
+  const DataBar = InnerG.merge(InnerPlot)
+    .selectAll('rect').data(hisData);
+  DataBar
+    .enter().append('rect')
+    .attr('x', d => xScale(d.x0) + 10)
+    .attr('y', d => yScale(0))
+    .attr('width', innerWidth / 10 - 20)
+    .attr('height',0)
+    .on('mousemove', d => {
+      let mouse = d3.pointer(event, InnerPlot);
+      let mouseX = mouse[0];
+      let mouseY = mouse[1];
+      show_amount(d.target.__data__.length, mouseX, mouseY);
+    })
+    .on('mouseout', () => d3.selectAll('#info-rect').remove())
+  .merge(DataBar)
+  .transition().duration(500)
+    .attr('x', d => xScale(d.x0) + 10)
+    .attr('y', d => yScale(d.length))
+    .attr('width', innerWidth / 10 - 20)
+    .attr('height', d => yScale(1000-d.length))
+    .attr('stroke', 'black')
+    .attr('stroke-width', 1)
+    .attr('fill', 'blue');
 }
 
-export const ReleaseLinechart = () => {
+export const ReleaseBarChart = () => {
   let ridge_data = {
-    selection: line_data.selection,
-    data: line_data.data,
-    split_col: line_data.split_col,
-    Label: line_data.cur_col,
+    selection: chart_data.bar_data.selection,
+    data: chart_data.bar_data.data,
+    split_col: chart_data.bar_data.split_col,
+    Label: chart_data.bar_data.cur_col,
   }
   d3.select("#plot").selectAll("div").remove();
-  d3.selectAll('path').remove();
+  d3.select('.InnerPlot').selectAll("*").remove();
   renderRidgeline(ridge_data);
 }
 
@@ -126,19 +162,19 @@ const LabelSelector = (selection) => {
   const menuDiv = menus.enter().append('div')
     .attr('id', 'menus');
   menuDiv.append('label')
-    .text(`on ${line_data.split_col} - ${line_data.cur_col} : `)
+    .text(`on ${chart_data.bar_data.split_col} - ${chart_data.bar_data.cur_col} : `)
   const xmenu = menuDiv.append('span')
     .attr('id', 'x-menu');
   menuDiv.append('button')
     .attr('id', 'release')
-    .attr('onclick', 'module.ReleaseLinechart()')
+    .attr('onclick', 'module.ReleaseBarChart()')
     .attr('style', 'position: relative; left: 20px; font-size: 1.5rem;')
     .text('Release');
 }
 
 const onColumnClicked = column => {
-  line_data.Label = column;
-  renderLineChart(line_data);
+  chart_data.bar_data.Label = column;
+  renderBarChart(chart_data.bar_data);
 };
 
 const MenuConfig = () => {
@@ -162,7 +198,7 @@ const MenuConfig = () => {
   option.forEach(el => el.style.cssText = optionStyle);
 }
 
-export const renderLineChart = (props) => {
+export const renderBarChart = (props) => {
   const {
     selection,
     data,
@@ -171,12 +207,12 @@ export const renderLineChart = (props) => {
     Label
   } = props;
 
-  if(line_data != props) {
-    line_data = props;
+  if(chart_data.bar_data != props) {
+    chart_data.bar_data = props;
     split_data = getSplitdata(data, split_col);
   }
 
-  LineChart(selection, Label);
+  BarChart(selection, Label);
   LabelSelector(selection.select(function() { return this.parentNode; }));
 
   d3.select('#x-menu')

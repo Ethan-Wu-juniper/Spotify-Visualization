@@ -21,12 +21,17 @@
     <script type="module" src="0816004.js"></script>
     <script type="text/javascript">
       let module = {};
+      let chart_data = {
+        bar_data: {},
+      };
     </script>
     <script type="module">
-      import { OnRangeChange } from './ridgeline.js';
-      import { ReleaseLinechart } from './linechart.js'
+      // import { ReleaseLinechart } from './charts/linechart.js'
+      import { OnRangeChange } from './charts/ridgeline.js';
+      import { ReleaseBarChart } from './charts/barchart.js'
+      // module.ReleaseLinechart = ReleaseLinechart;
       module.OnRangeChange = OnRangeChange;
-      module.ReleaseLinechart = ReleaseLinechart;
+      module.ReleaseBarChart = ReleaseBarChart;
     </script>
     <!-- <script type="module" src="test.js"></script> -->
   </body>

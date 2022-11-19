@@ -14,8 +14,6 @@ const BarChart = (selection, xLabel) => {
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  selection.attr('transform', `translate(50, 10)`);
-
   const InnerG = selection.selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
     .merge(InnerG)
@@ -93,9 +91,9 @@ const BarChart = (selection, xLabel) => {
     const InfoEnter = InfoG.enter().append('g')
       .merge(InfoG)
       .attr('id', 'info-rect')
-      .attr('transform', `translate(${mouseX}, ${mouseY})`)
+      .attr('transform', `translate(0, 0)`);
 
-    const rect_size = {x: -130, y: -120, width: 100, height: 50}
+    const rect_size = {x: mouseX, y: mouseY-60, width: 100, height: 50}
     const InfoRect = InfoEnter.merge(InfoG)
       .selectAll('rect').data([null]);
     InfoRect.enter().append('rect')
@@ -128,7 +126,7 @@ const BarChart = (selection, xLabel) => {
     .attr('width', innerWidth / 10 - 20)
     .attr('height',0)
     .on('mousemove', d => {
-      let mouse = d3.pointer(event, InnerPlot);
+      let mouse = d3.pointer(event);
       let mouseX = mouse[0];
       let mouseY = mouse[1];
       show_amount(d.target.__data__.length, mouseX, mouseY);
@@ -166,9 +164,10 @@ const LabelSelector = (selection) => {
   const xmenu = menuDiv.append('span')
     .attr('id', 'x-menu');
   menuDiv.append('button')
+    .attr('class', 'btn btn-secondary')
     .attr('id', 'release')
     .attr('onclick', 'module.ReleaseBarChart()')
-    .attr('style', 'position: relative; left: 20px; font-size: 1.5rem;')
+    .attr('style', 'position: relative; left: 20px; top: -2px; font-size: 1.5rem;')
     .text('Release');
 }
 
@@ -177,26 +176,6 @@ const onColumnClicked = column => {
   renderBarChart(chart_data.bar_data);
 };
 
-const MenuConfig = () => {
-  const menu = document.querySelector('#menus');
-  const menuStyle = `
-    font-size: 2.5em;
-    position: relative; left: 450px;
-  `;
-  menu.style.cssText = menuStyle;
-
-  const menuselect = document.querySelectorAll('#menus select');
-  const selectStyle = `
-    font-size: 2.5rem;
-  `;
-  menuselect.forEach(el => el.style.cssText = selectStyle);
-
-  const option = document.querySelectorAll('#menus select option');
-  const optionStyle = `
-    font-size: 1rem;
-  `;
-  option.forEach(el => el.style.cssText = optionStyle);
-}
 
 export const renderBarChart = (props) => {
   const {
@@ -225,5 +204,5 @@ export const renderBarChart = (props) => {
       selectedOption: Label
     });
 
-  MenuConfig();
+  // MenuConfig();
 }

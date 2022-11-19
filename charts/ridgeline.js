@@ -25,11 +25,10 @@ const Ridgeline = (selection, Label) => {
   const width = +selection.attr('width');
   const height = +selection.attr('height');
 
-  const margin = { top: 100, right: 200, bottom: 70, left: 250 };
+  const margin = { top: 50, right: 100, bottom: 70, left: 150 };
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  selection.attr('transform', `translate(50, 10)`);
 
   const InnerG = selection.selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
@@ -221,27 +220,6 @@ const LabelSelector = (selection) => {
     .attr('oninput', 'module.OnRangeChange(this.value)');
 }
 
-const MenuConfig = () => {
-  const menu = document.querySelector('#menus');
-  const menuStyle = `
-    font-size: 2.5em;
-    position: relative; left: 500px;
-  `;
-  menu.style.cssText = menuStyle;
-
-  const menuselect = document.querySelectorAll('#menus select');
-  const selectStyle = `
-    font-size: 2.5rem;
-  `;
-  menuselect.forEach(el => el.style.cssText = selectStyle);
-
-  const option = document.querySelectorAll('#menus select option');
-  const optionStyle = `
-    font-size: 1rem;
-  `;
-  option.forEach(el => el.style.cssText = optionStyle);
-}
-
 
 export const renderRidgeline = (props) => {
   const {
@@ -266,5 +244,5 @@ export const renderRidgeline = (props) => {
       selectedOption: Label
     });
 
-  MenuConfig();
+  // MenuConfig();
 }

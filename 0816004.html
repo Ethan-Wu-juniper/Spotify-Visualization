@@ -1,38 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <header>
-    <title>Hw2</title>
-    <link rel="stylesheet" href="0816004.css">
-    <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
-    <!-- <script type="module" src="https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"></script> -->
-  </header>
-  <body>
+<header>
+  <meta charset="utf-8">
+  <title>Hw2</title>
+  <link rel="stylesheet" href="0816004.css">
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+    integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <!-- bootstrap-icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+  <!-- d3 -->
+  <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
+  <!-- jquery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+</header>
 
-    <div id="search-box">
-      <label for="id">Search for : </label>
-      <span id="column"></span>
-      <input type="text" id="id" name="id">
-      <button id="submit" onclick="get_id();">submit</button>
+<body>
+  <div id="mobile-menu" class="mobile-nav visible-xs visible-sm show-nav">
+    <button class="btn btn-secondary" id="hide-sidebar"><i class="bi bi-arrow-bar-left"></i></button>
+    <ul>
+      <li><a href="#">首頁</a></li>
+      <li><a href="javascript:void(0);" onclick="module.render('ridgeline')">Genre Analysis</a></li>
+      <li><a href="#">SVN</a></li>
+      <li><a href="#">iOS</a></li>
+    </ul>
+  </div>
+
+  <nav class="navbar navbar-light bg-light">
+    <div class="navbar-inner">
+      <button class="navbar-toggler" id="show-sidebar" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand">Spotify Visulization</a>
     </div>
-    
-    <div id="plot">
-      <svg class="svg-plot" height="800" width="1500"></svg>
-    </div>
-    <script type="module" src="0816004.js"></script>
-    <script type="text/javascript">
-      let module = {};
-      let chart_data = {
-        bar_data: {},
-      };
-    </script>
-    <script type="module">
-      // import { ReleaseLinechart } from './charts/linechart.js'
-      import { OnRangeChange } from './charts/ridgeline.js';
-      import { ReleaseBarChart } from './charts/barchart.js'
-      // module.ReleaseLinechart = ReleaseLinechart;
-      module.OnRangeChange = OnRangeChange;
-      module.ReleaseBarChart = ReleaseBarChart;
-    </script>
-    <!-- <script type="module" src="test.js"></script> -->
-  </body>
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </nav>
+
+  <div id="plot">
+    <svg class="svg-plot" height="800" width="1500"></svg>
+  </div>
+  <script type="module" src="0816004.js"></script>
+  <script type="text/javascript">
+    let module = {};
+    let chart_data = {
+      bar_data: {},
+    };
+  </script>
+  <script type="module">
+    import { render } from './0816004.js'
+    import { OnRangeChange } from './charts/ridgeline.js';
+    import { ReleaseBarChart } from './charts/barchart.js'
+    module.render = render;
+    module.OnRangeChange = OnRangeChange;
+    module.ReleaseBarChart = ReleaseBarChart;
+  </script>
+  <!-- <script type="module" src="test.js"></script> -->
+</body>
+
 </html>

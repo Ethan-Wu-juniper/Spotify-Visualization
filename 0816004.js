@@ -20,45 +20,13 @@ const get_id = () => {
   console.log(out);
 }
 
-const onColumnClicked = column => {
-  plot_type = column;
-  // const innerPlot = d3.select(".InnerPlot");
-  // innerPlot.selectAll("path").remove();
+export const render = (plot_type) => {
   plot.selectAll("*").remove();
   d3.select("#plot").selectAll("div").remove();
-  render();
-};
 
-const render = () => {
+  if(plot_type == "homepage") {
 
-  d3.select('#column')
-    .call(dropdownMenu, {
-      options: plot_types,
-      onOptionClicked: onColumnClicked,
-      selectedOption: plot_type
-    });
-  
-  // if(plot_type == "scatter") {
-  //   let scatter_data = {
-  //     selection: plot,
-  //     data: data,
-  //     split_col: 'track_genre',
-  //     xLabel: 'popularity',
-  //     yLabel: 'danceability'
-  //   };
-  //   renderScatter(scatter_data);
-  // }
-
-  // if(plot_type == "linechart") {
-  //   let line_data = {
-  //     selection: plot,
-  //     data: data,
-  //     split_col: 'track_genre',
-  //     cur_col: 'acoustic',
-  //     Label: 'danceability',
-  //   }
-  //   renderLineChart(line_data);
-  // }
+  }
 
   if(plot_type == "barchart") {
     let bar_data = {
@@ -95,12 +63,47 @@ const show_col = (col) => {
   console.log(`min : ${Math.min(...stat_key)}`);
 }
 
+const mobileMenuSwitch = () => {
+  $("#show-sidebar").click(function () {
+    let mobileMenu = $("#mobile-menu");
+    if (mobileMenu.hasClass("hide-nav")) {
+      setTimeout(function () {
+        mobileMenu.addClass("show-nav").removeClass("hide-nav");
+      }, 100)
+    }
+  });
+
+  $("#hide-sidebar").click(function () {
+    let mobileMenu = $("#mobile-menu");
+    if (mobileMenu.hasClass("show-nav")) {
+      setTimeout(function () {
+        mobileMenu.addClass("hide-nav").removeClass("show-nav");
+      }, 100)
+    }
+  });
+
+  $(window).click(function() {
+    let mobileMenu = $("#mobile-menu");
+    if (mobileMenu.hasClass("show-nav")) {
+      setTimeout(function () {
+        mobileMenu.addClass("hide-nav").removeClass("show-nav");
+      }, 100)
+    }
+  });
+  
+  $('#mobile-menu').click(function(event){
+    event.stopPropagation();
+  });
+}
+
 d3.csv("archive/dataset.csv").then(loaddata => {
   data = loaddata;
   columns = data.columns.slice(1);
-  render();
+  render("homepage");
+  mobileMenuSwitch();
   // columns.forEach(col => {
   //   show_col(col);
   //   console.log(col);
   // })
+  
 })

@@ -6,9 +6,13 @@ export class DefaultDict {
   }
 };
 
-export function fn() {
-  console.log('這是一段函式')
-};
+export function getElementSize(tag) {
+  let box = document.querySelector(tag);
+  let h = +box.height.baseVal.value;
+  let w = +box.width.baseVal.value;
+
+  return { h, w };
+}
 
 export function getSplitdata(input_data, split_col) {
   let data = {};

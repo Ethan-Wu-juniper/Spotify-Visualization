@@ -1,14 +1,13 @@
 import { DefaultDict, dropdownMenu, plot_types } from './utils.js'
-// import { renderScatter } from './charts/deprecated/scatter.js'
-// import { renderLineChart } from './charts/deprecated/linechart.js'
 import { renderRidgeline } from './charts/ridgeline.js'
 import { renderBarChart } from './charts/barchart.js'
+import { renderSpider } from './charts/track.js'
 
 let data;
 let columns;
 let Label = "id";
 let plot_type = "ridgeline";
-const plot = d3.select('.svg-plot');
+const plot = d3.select('#main-plot');
 
 const get_id = () => {
   let input = document.getElementById("id").value;
@@ -47,6 +46,15 @@ export const render = (plot_type) => {
       Label: 'acoustic'
     }
     renderRidgeline(ridge_data);
+  }
+
+  if(plot_type == "spider") {
+    let spider_data = {
+      selection: plot,
+      data: data,
+      track_name: 'Comedy'
+    }
+    renderSpider(spider_data);
   }
 
 }

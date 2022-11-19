@@ -1,11 +1,27 @@
 @charset "UTF-8";
+
 * {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden
 }
 
 #plot {
     text-align: center;
+}
+
+#plot svg {
+    position: fixed;
+    top: 70;
+    left: 0;
+    height: 100%;
+    width: 100%;
 }
 
 #menus {
@@ -23,6 +39,10 @@
 
 #menus select option {
     font-size: 1rem;
+}
+
+.navbar {
+    height: 70px;
 }
 
 .navbar-brand {
@@ -101,7 +121,7 @@ a:focus {
     text-decoration: none;
 }
 
-.mobile-nav ul{
+.mobile-nav ul {
     position: relative;
     top: 20px;
 }
@@ -128,7 +148,7 @@ a:focus {
 }
 
 .mobile-nav ul li a:hover {
-    background-color: #23A1F6;
+    background-color: #23a1f6;
     color: #ffffff;
 }
 

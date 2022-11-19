@@ -147,7 +147,7 @@ const Ridgeline = (selection, Label) => {
         .attr("stroke-width", 1)
         .call(PathMouseEvent)
       .merge(DataLine)
-      .transition().duration(300)
+      .transition().duration(200)
         .attr("id", d => d.key)
         .attr("class", "dataline")
         .attr("transform", d => {

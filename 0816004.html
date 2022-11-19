@@ -21,9 +21,9 @@
   <div id="mobile-menu" class="mobile-nav visible-xs visible-sm show-nav">
     <button class="btn btn-secondary" id="hide-sidebar"><i class="bi bi-arrow-bar-left"></i></button>
     <ul>
-      <li><a href="#">首頁</a></li>
+      <li><a href="javascript:void(0);" onclick="module.render('homepage')">首頁</a></li>
       <li><a href="javascript:void(0);" onclick="module.render('ridgeline')">Genre Analysis</a></li>
-      <li><a href="#">SVN</a></li>
+      <li><a href="javascript:void(0);" onclick="module.render('spider')">Tracks</a></li>
       <li><a href="#">iOS</a></li>
     </ul>
   </div>
@@ -44,19 +44,26 @@
   </nav>
 
   <div id="plot">
-    <svg class="svg-plot" height="800" width="1500"></svg>
+    <svg class="svg-plot" id="main-plot"></svg>
   </div>
   <script type="module" src="0816004.js"></script>
+  <script type="module" src="utils.js"></script>
+  <script type="module" src="charts/barchart.js"></script>
+  <script type="module" src="charts/ridgeline.js"></script>
+  <script type="module" src="charts/track.js"></script>
+
   <script type="text/javascript">
     let module = {};
     let chart_data = {
       bar_data: {},
+      spider_data: {}
     };
   </script>
   <script type="module">
-    import { render } from './0816004.js'
+    import { render } from './0816004.js';
     import { OnRangeChange } from './charts/ridgeline.js';
-    import { ReleaseBarChart } from './charts/barchart.js'
+    import { ReleaseBarChart } from './charts/barchart.js';
+
     module.render = render;
     module.OnRangeChange = OnRangeChange;
     module.ReleaseBarChart = ReleaseBarChart;

@@ -12,19 +12,25 @@
   <!-- d3 -->
   <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
   <!-- jquery -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+  <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
     integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-    crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script> -->
 </header>
 
 <body>
   <div id="mobile-menu" class="mobile-nav visible-xs visible-sm show-nav">
     <button class="btn btn-secondary" id="hide-sidebar"><i class="bi bi-arrow-bar-left"></i></button>
     <ul>
-      <li><a href="javascript:void(0);" onclick="module.render('homepage')">首頁</a></li>
+      <li><a href="javascript:void(0);" onclick="module.render('homepage')">Home Page</a></li>
+      <li><a href="https://open.spotify.com/" target=”_blank”>Spotify</a></li>
+      <li><a href="javascript:void(0);" onclick="module.render('tracklist')">Tracks</a></li>
       <li><a href="javascript:void(0);" onclick="module.render('ridgeline')">Genre Analysis</a></li>
-      <li><a href="javascript:void(0);" onclick="module.render('spider')">Tracks</a></li>
-      <li><a href="#">iOS</a></li>
+      <!-- <li><a href="javascript:void(0);" onclick="module.render('spider')">Track Spider</a></li> -->
     </ul>
   </div>
 
@@ -35,22 +41,18 @@
 
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand">Spotify Visulization</a>
+      <a class="navbar-brand" href="javascript:void(0);" onclick="module.render('homepage')">Spotify Visulization</a>
     </div>
     <form class="form-inline">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <input class="form-control mr-sm-2" id="search-box" type="text" placeholder="Search Track" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" id="search-button" type="button" onclick="module.showTrack(document.getElementById('search-box').value)">Search</button>
     </form>
   </nav>
 
   <div id="plot">
-    <svg class="svg-plot" id="main-plot"></svg>
+    <!-- <svg class="svg-plot" id="main-plot" width="1500" height="800"></svg> -->
   </div>
   <script type="module" src="0816004.js"></script>
-  <script type="module" src="utils.js"></script>
-  <script type="module" src="charts/barchart.js"></script>
-  <script type="module" src="charts/ridgeline.js"></script>
-  <script type="module" src="charts/track.js"></script>
 
   <script type="text/javascript">
     let module = {};
@@ -58,13 +60,24 @@
       bar_data: {},
       spider_data: {}
     };
+
+    var button = document.getElementById("search-button");
+    var textBox = document.getElementById("search-box");
+    textBox.addEventListener("keypress", function (event) {
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        button.click();
+        return true;
+      }
+    });
   </script>
   <script type="module">
-    import { render } from './0816004.js';
+    import { render, showTrack } from './0816004.js';
     import { OnRangeChange } from './charts/ridgeline.js';
     import { ReleaseBarChart } from './charts/barchart.js';
 
     module.render = render;
+    module.showTrack = showTrack;
     module.OnRangeChange = OnRangeChange;
     module.ReleaseBarChart = ReleaseBarChart;
   </script>

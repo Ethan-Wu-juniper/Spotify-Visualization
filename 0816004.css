@@ -14,14 +14,12 @@ body {
 
 #plot {
     text-align: center;
-}
-
-#plot svg {
     position: fixed;
-    top: 70;
-    left: 0;
-    height: 100%;
-    width: 100%;
+    height: 90%;
+    width: 95%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+    /* overflow-y: auto; */
 }
 
 #menus {
@@ -160,4 +158,10 @@ a:focus {
 .hide-nav {
     transform: translateX(-220px);
     transition: all 0.5s;
+}
+
+tr {
+    line-height: 35px;
+    /* min-height: 25px;
+    height: 25px; */
 }

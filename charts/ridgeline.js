@@ -1,4 +1,4 @@
-import { getSplitdata, float_col, dropdownMenu, getLabelCount } from '../utils.js'
+import { getSplitdata, float_col, dropdownMenu, clearWindow } from '../utils.js'
 import { renderBarChart } from './barchart.js'
 // import { interpolatePath } from "https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"
 
@@ -22,15 +22,23 @@ const Ridgeline = (selection, Label) => {
   let data = split_data.data[Label];
   let categories = float_col;
   
-  const width = +selection.attr('width');
-  const height = +selection.attr('height');
+  const height = 800;
+  const width = 1500;
 
-  const margin = { top: 50, right: 100, bottom: 70, left: 150 };
+  const svg = selection.selectAll('.svg-plot').data([null]);
+  const svgEnter = svg.enter().append('svg')
+  .merge(svg)
+    .attr('class', 'svg-plot')
+    .attr('height', height)
+    .attr('width', width);
+
+  const margin = { top: 50, right: 150, bottom: 70, left: 240 };
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
 
-  const InnerG = selection.selectAll('.InnerPlot').data([null]);
+  const InnerG = svg.merge(svgEnter)
+    .selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
     .merge(InnerG)
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
@@ -121,8 +129,7 @@ const Ridgeline = (selection, Label) => {
         cur_col: ridge_data.Label,
         Label: selected_id,
       }
-      d3.select("#plot").selectAll("div").remove();
-      d3.select('.InnerPlot').selectAll("*").remove();
+      clearWindow();
       document.body.style.cursor = "default";
       renderBarChart(bar_data);
     })
@@ -235,7 +242,7 @@ export const renderRidgeline = (props) => {
   }
 
   Ridgeline(selection, Label);
-  LabelSelector(selection.select(function() { return this.parentNode; }));
+  LabelSelector(selection);
 
   d3.select('#x-menu')
     .call(dropdownMenu, {

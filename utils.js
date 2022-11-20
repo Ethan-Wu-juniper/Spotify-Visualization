@@ -7,11 +7,11 @@ export class DefaultDict {
 };
 
 export function getElementSize(tag) {
-  let box = document.querySelector(tag);
-  let h = +box.height.baseVal.value;
-  let w = +box.width.baseVal.value;
+  let box = document.querySelector(tag).getBBox();
+  let height = +box.height;
+  let width = +box.width;
 
-  return { h, w };
+  return { height, width };
 }
 
 export function getSplitdata(input_data, split_col) {
@@ -60,6 +60,11 @@ export const getLabelCount = (data, Label) => {
   });
 
   return LabelCount.sort((a,b) => a[0] - b[0]);
+}
+
+export const clearWindow = () => {
+  // d3.select('#main-plot').selectAll("*").remove();
+  d3.select("#plot").selectAll("*").remove();
 }
 
 const nonNumeric_col = ["track_id", "artists", "album_name", "track_name", "track_genre", "time_signature", "explicit", "key", "mode"];

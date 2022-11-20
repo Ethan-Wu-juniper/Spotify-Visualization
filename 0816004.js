@@ -1,13 +1,17 @@
-import { DefaultDict, dropdownMenu, plot_types } from './utils.js'
+import { DefaultDict, dropdownMenu, plot_types, clearWindow } from './utils.js'
 import { renderRidgeline } from './charts/ridgeline.js'
 import { renderBarChart } from './charts/barchart.js'
 import { renderSpider } from './charts/track.js'
+import { renderTrackList } from './charts/track_list.js'
 
 let data;
 let columns;
 let Label = "id";
-let plot_type = "ridgeline";
-const plot = d3.select('#main-plot');
+let plot_type;
+const plot = d3.select('#plot');
+
+// plot.attr('width', window.innerWidth);
+// plot.attr('height', window.innerHeight-200);
 
 const get_id = () => {
   let input = document.getElementById("id").value;
@@ -19,15 +23,15 @@ const get_id = () => {
   console.log(out);
 }
 
-export const render = (plot_type) => {
-  plot.selectAll("*").remove();
-  d3.select("#plot").selectAll("div").remove();
+export const render = (type) => {
+  clearWindow();
+  plot_type = type;
 
-  if(plot_type == "homepage") {
+  if(type == "homepage") {
 
   }
 
-  if(plot_type == "barchart") {
+  if(type == "barchart") {
     let bar_data = {
       selection: plot,
       data: data,
@@ -38,7 +42,7 @@ export const render = (plot_type) => {
     renderBarChart(bar_data);
   }
 
-  if(plot_type == "ridgeline") {
+  if(type == "ridgeline") {
     let ridge_data = {
       selection: plot,
       data: data,
@@ -48,15 +52,39 @@ export const render = (plot_type) => {
     renderRidgeline(ridge_data);
   }
 
-  if(plot_type == "spider") {
+  if(type == "spider") {
     let spider_data = {
       selection: plot,
       data: data,
-      track_name: 'Comedy'
+      track_id: 0,
+      tracklist_data: null
     }
     renderSpider(spider_data);
   }
 
+  if(type == "tracklist") {
+    let tracklist_data = {
+      selection: plot,
+      data: data,
+      track_name: '',
+      page: 1
+    }
+    renderTrackList(tracklist_data);
+  }
+
+}
+
+export const showTrack = (value) => {
+  plot_type = "tracklist";
+  clearWindow();
+  
+  let tracklist_data = {
+    selection: plot,
+    data: data,
+    track_name: value,
+    page: 1
+  }
+  renderTrackList(tracklist_data);
 }
 
 const show_col = (col) => {
@@ -105,6 +133,7 @@ const mobileMenuSwitch = () => {
 }
 
 d3.csv("archive/dataset.csv").then(loaddata => {
+// d3.csv("http://vis.lab.djosix.com:2020/data/spotify_tracks.csv").then(loaddata => {
   data = loaddata;
   columns = data.columns.slice(1);
   render("homepage");

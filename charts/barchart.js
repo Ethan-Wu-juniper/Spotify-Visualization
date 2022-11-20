@@ -1,5 +1,5 @@
 import { renderRidgeline } from './ridgeline.js';
-import { getSplitdata, dropdownMenu, float_col, getLabelCount } from '../utils.js'
+import { getSplitdata, dropdownMenu, float_col, clearWindow } from '../utils.js'
 
 // let chart_data.bar_data;
 let split_data;
@@ -7,14 +7,22 @@ let split_data;
 const BarChart = (selection, xLabel) => {
   let data = split_data.data[chart_data.bar_data.cur_col];
   
-  const width = +selection.attr('width');
-  const height = +selection.attr('height');
+  const height = 800;
+  const width = 1500;
 
-  const margin = { top: 30, right: 20, bottom: 70, left: 100 };
+  const svg = selection.selectAll('.svg-plot').data([null]);
+  const svgEnter = svg.enter().append('svg')
+  .merge(svg)
+    .attr('class', 'svg-plot')
+    .attr('height', height)
+    .attr('width', width);
+
+  const margin = { top: 30, right: 150, bottom: 70, left: 240 };
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  const InnerG = selection.selectAll('.InnerPlot').data([null]);
+  const InnerG = svg.merge(svgEnter)
+    .selectAll('.InnerPlot').data([null]);
   const InnerPlot = InnerG.enter().append('g')
     .merge(InnerG)
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
@@ -150,8 +158,7 @@ export const ReleaseBarChart = () => {
     split_col: chart_data.bar_data.split_col,
     Label: chart_data.bar_data.cur_col,
   }
-  d3.select("#plot").selectAll("div").remove();
-  d3.select('.InnerPlot').selectAll("*").remove();
+  clearWindow();
   renderRidgeline(ridge_data);
 }
 
@@ -192,7 +199,7 @@ export const renderBarChart = (props) => {
   }
 
   BarChart(selection, Label);
-  LabelSelector(selection.select(function() { return this.parentNode; }));
+  LabelSelector(selection);
 
   d3.select('#x-menu')
     .call(dropdownMenu, {

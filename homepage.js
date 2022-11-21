@@ -85,5 +85,6 @@ export const renderHomepage = (props) => {
   const {
     selection
   } = props;
+  d3.select('#plot').style('overflow-y', null);
   homepage(selection);
 }

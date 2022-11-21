@@ -5,6 +5,7 @@ let tracklist_data;
 
 const trackList = (selection, track_data, page) => {
   const result_num = track_data.length;
+  const track_results = track_data;
   track_data = track_data.slice(10*(page-1),10*page);
 
   let column_show = ["track_name", "artists", "album_name", "track_genre", "duration_ms"];
@@ -69,6 +70,7 @@ const trackList = (selection, track_data, page) => {
           data: tracklist_data.data,
           track_id: id,
           tracklist_data: tracklist_data,
+          track_results: track_results
         }
         renderSpider(spider_data);
     });

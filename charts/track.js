@@ -1,7 +1,7 @@
 import { getElementSize, nonNumeric_col, float_col, clearWindow } from "../utils.js";
 import { renderTrackList } from "./track_list.js";
 
-const spiderChart = (selection, track_data) => {
+const spiderChart = (selection, track_data, track_results) => {
   const height = 780;
   const width = 1500;
 
@@ -146,6 +146,106 @@ const spiderChart = (selection, track_data) => {
     .attr("fill", "#3333AA")
     .attr("stroke-opacity", 1)
     .attr("opacity", 0.5);
+
+  const cur_idx = track_results.findIndex(d => d == track_data);
+  console.log('cur_idx', cur_idx);
+
+  const renderNeighbor = (prev) => {
+    let next_idx
+    if(prev)
+      next_idx = cur_idx - 1;
+    else
+      next_idx = cur_idx + 1;
+
+    d3.select("#plot").selectAll('div').remove();
+    chart_data.spider_data.track_id = track_results[next_idx][""];
+    chart_data.spider_data.tracklist_data.page = Math.ceil((next_idx+1)/10);
+    console.log("passed page", chart_data.spider_data.tracklist_data.page);
+    renderSpider(chart_data.spider_data);
+  }
+
+  const arrowOnclick = (prev) => (el) => {
+    el.on("mouseover", function(_, d) {
+      d3.select(this).attr('fill', 'blue');
+      document.body.style.cursor = "pointer";
+    })
+    .on("mouseout", function(_, d) {
+      d3.select(this).attr('fill', 'black');
+      document.body.style.cursor = "default";
+    })
+    .on("click", function(_, d) {
+      renderNeighbor(prev);
+    })
+  }
+
+  if(cur_idx != 0) {  
+    const PrevG = svg.merge(svgEnter)
+      .selectAll('.Prev-group').data([null]);
+    const Prev = PrevG.enter().append('g')
+      .merge(PrevG)
+      .attr('width', 30)
+      .attr('transform', `translate(30, ${center.y})`)
+      .attr('class', 'Prev-group');
+
+    const PrevText = PrevG.merge(Prev)
+      .selectAll('#prev-text').data([null]);
+    PrevText.enter().append('text')
+    .merge(PrevText)
+      .attr('id', 'prev-text')
+      .attr('font-size', '25px')
+      .call(arrowOnclick(true))
+      .text('Previous');
+    
+    const arrow = d3.line()
+      .x(d => d[0])
+      .y(d => d[1]);
+    const PrevArrow = PrevG.merge(Prev)
+      .selectAll('#prev-arrow').data([null]);
+    PrevArrow.enter().append('path')
+    .merge(PrevArrow)
+      .attr('d', () => arrow([[100,20],[0,20],[10,30]]))
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+  }
+  else {
+    document.body.style.cursor = "default";
+    d3.selectAll('.Prev-group').remove();
+  }
+
+
+  if(cur_idx != track_results.length-1) {  
+    const NextG = svg.merge(svgEnter)
+      .selectAll('.Next-group').data([null]);
+    const Next = NextG.enter().append('g')
+      .merge(NextG)
+      .attr('width', 30)
+      .attr('transform', `translate(${width-170}, ${center.y})`)
+      .attr('class', 'Next-group');
+
+    const NextText = NextG.merge(Next)
+      .selectAll('#next-text').data([null]);
+    NextText.enter().append('text')
+    .merge(NextText)
+      .attr('id', 'next-text')
+      .attr('font-size', '25px')
+      .call(arrowOnclick(false))
+      .text('Next');
+    
+    const arrow = d3.line()
+      .x(d => d[0])
+      .y(d => d[1]);
+    const NextArrow = NextG.merge(Next)
+      .selectAll('#next-arrow').data([null]);
+    NextArrow.enter().append('path')
+    .merge(NextArrow)
+      .attr('d', () => arrow([[0,20],[100,20],[90,30]]))
+      .attr('fill', 'none')
+      .attr('stroke', 'black')
+  }
+  else {
+    document.body.style.cursor = "default";
+    d3.selectAll('.Next-group').remove();
+  }
 }
 
 const PlotTitle = (selection, track_data, tracklist_data) => {
@@ -196,7 +296,7 @@ const PlotTitle = (selection, track_data, tracklist_data) => {
       clearWindow()
       renderTrackList(tracklist_data);
     })
-    .text('Release');
+    .text('Back to list');
 }
 
 export const renderSpider = (props) => {
@@ -204,14 +304,17 @@ export const renderSpider = (props) => {
     selection,
     data,
     track_id,
-    tracklist_data
+    tracklist_data,
+    track_results
   } = props;
+
+  console.log('page', tracklist_data.page);
 
   if (chart_data.spider_data != props) {
     chart_data.spider_data = props;
   }
   d3.select('#plot').style('overflow-y', null);
   let track_data = data.filter(d => d[""] == track_id)[0];
-  spiderChart(selection, track_data);
+  spiderChart(selection, track_data, track_results);
   PlotTitle(selection, track_data, tracklist_data);
 }

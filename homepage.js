@@ -5,7 +5,7 @@ const homepage = (selection) => {
   .append('div')
     .style('position', 'relative')
     .style('top', '10%')
-    .on('mouseover', document.body.style.cursor = "default")
+    .on('mouseover', function () {document.body.style.cursor = "default"})
   .append('h1')
     .style('font-size', '130px')
     .style('font-family', 'Arial,sans-serif')

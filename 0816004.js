@@ -1,8 +1,8 @@
 import { DefaultDict, dropdownMenu, plot_types, clearWindow } from './utils.js'
-import { renderRidgeline } from './charts/ridgeline.js'
-import { renderBarChart } from './charts/barchart.js'
-import { renderSpider } from './charts/track.js'
-import { renderTrackList } from './charts/track_list.js'
+import { renderRidgeline } from './ridgeline.js'
+import { renderBarChart } from './barchart.js'
+import { renderSpider } from './track.js'
+import { renderTrackList } from './track_list.js'
 import { renderHomepage } from './homepage.js'
 
 let data;

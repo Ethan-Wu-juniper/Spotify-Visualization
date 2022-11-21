@@ -1,5 +1,5 @@
 import { renderRidgeline } from './ridgeline.js';
-import { getSplitdata, dropdownMenu, float_col, clearWindow } from '../utils.js'
+import { getSplitdata, dropdownMenu, float_col, clearWindow } from './utils.js'
 
 // let chart_data.bar_data;
 let split_data;

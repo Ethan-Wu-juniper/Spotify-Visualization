@@ -1,9 +1,9 @@
-import { DefaultDict, dropdownMenu, plot_types, clearWindow } from './utils.js'
-import { renderRidgeline } from './ridgeline.js'
-import { renderBarChart } from './barchart.js'
-import { renderSpider } from './track.js'
-import { renderTrackList } from './track_list.js'
-import { renderHomepage } from './homepage.js'
+import { DefaultDict, dropdownMenu, plot_types, clearWindow } from './0816004_utils.js'
+import { renderRidgeline } from './0816004_ridgeline.js'
+import { renderBarChart } from './0816004_barchart.js'
+import { renderSpider } from './0816004_track.js'
+import { renderTrackList } from './0816004_track_list.js'
+import { renderHomepage } from './0816004_homepage.js'
 
 let data;
 let columns;

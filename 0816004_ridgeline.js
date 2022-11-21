@@ -1,6 +1,5 @@
-import { getSplitdata, float_col, dropdownMenu, clearWindow } from '../utils.js'
-import { renderBarChart } from './barchart.js'
-// import { interpolatePath } from "https://unpkg.com/d3-interpolate-path@2.3.0/build/d3-interpolate-path.mjs"
+import { getSplitdata, float_col, dropdownMenu, clearWindow } from './0816004_utils.js'
+import { renderBarChart } from './0816004_barchart.js'
 
 let ridge_data;
 let split_data;

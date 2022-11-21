@@ -1,5 +1,5 @@
-import { renderSpider } from "./track.js";
-import { clearWindow } from "../utils.js";
+import { renderSpider } from "./0816004_track.js";
+import { clearWindow } from "./0816004_utils.js";
 
 let tracklist_data;
 
@@ -82,7 +82,7 @@ const trackList = (selection, track_data, page) => {
 
 const pageBar = (track_data, page) => {
   $(document).ready(function(){
-    $("#plot").append($('<div class="pagination">').load("./pagination.html", function() {
+    $("#plot").append($('<div class="pagination">').load("./0816004_pagination.html", function() {
       const max_page = Math.ceil(track_data.length/10);
       const load_page = (page_num) => {
         clearWindow();

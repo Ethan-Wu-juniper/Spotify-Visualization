@@ -3,6 +3,7 @@ import { renderRidgeline } from './charts/ridgeline.js'
 import { renderBarChart } from './charts/barchart.js'
 import { renderSpider } from './charts/track.js'
 import { renderTrackList } from './charts/track_list.js'
+import { renderHomepage } from './homepage.js'
 
 let data;
 let columns;
@@ -28,7 +29,10 @@ export const render = (type) => {
   plot_type = type;
 
   if(type == "homepage") {
-
+    let home_data = {
+      selection: plot,
+    }
+    renderHomepage(home_data);
   }
 
   if(type == "barchart") {
@@ -132,8 +136,8 @@ const mobileMenuSwitch = () => {
   });
 }
 
-d3.csv("archive/dataset.csv").then(loaddata => {
-// d3.csv("http://vis.lab.djosix.com:2020/data/spotify_tracks.csv").then(loaddata => {
+// d3.csv("archive/dataset.csv").then(loaddata => {
+d3.csv("http://vis.lab.djosix.com:2020/data/spotify_tracks.csv").then(loaddata => {
   data = loaddata;
   columns = data.columns.slice(1);
   render("homepage");

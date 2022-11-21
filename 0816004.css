@@ -15,11 +15,65 @@ body {
 #plot {
     text-align: center;
     position: fixed;
-    height: 90%;
+    height: 95%;
     width: 95%;
     margin-left: 2.5%;
     margin-right: 2.5%;
     /* overflow-y: auto; */
+}
+
+.home-block {
+    display: inline-block;
+    position: relative;
+    /* border: 5px solid; */
+    top: 55%;
+    transform: translate(0, -50%);
+    padding: 10px;
+    height: 70%;
+    width: 30%;
+}
+
+.intro-block {
+    /* background:#36abf9; */
+    /* opacity: 0.7; */
+    /* border-radius: 25px; */
+    /* border: 2px solid; */
+    height: 100%;
+    width: 100%;
+}
+
+.icon-div {
+    border-radius: 100%;
+    border: 2px solid;
+    height: 250px;
+    width: 250px;
+    margin-left:auto;
+    margin-right:auto;
+    background: gray;
+    opacity: 0.6;
+}
+
+.icon-div .bi {
+    font-size: 10rem;
+    color: black;
+}
+
+.title-div {
+    position: relative;
+    top: 60px;
+}
+
+.title-div h1 {
+    font-size: 60px;
+}
+
+.content-div {
+    position: relative;
+    top: 60px;
+}
+
+.content-div text {
+    font-size: 30px;
 }
 
 #menus {

@@ -3,12 +3,11 @@ import { clearWindow } from "../utils.js";
 
 let tracklist_data;
 
-
 const trackList = (selection, track_data, page) => {
   const result_num = track_data.length;
   track_data = track_data.slice(10*(page-1),10*page);
 
-  let column_show = ["track_name", "artists", "album_name", "popularity"];
+  let column_show = ["track_name", "artists", "album_name", "track_genre", "duration_ms"];
   const Title = selection.append("h1")
     .attr('font-size', 40)
     .style('padding', '15px')
@@ -25,7 +24,13 @@ const trackList = (selection, track_data, page) => {
   tableTitles.selectAll('th')
   .data(column_show).enter()
     .append('th')
-    .text(d => d);
+    .text(d => {
+      let col = d;
+      if(d == "duration_ms")
+        col = "duration";
+      col = col.split('_').map(d => d[0].toUpperCase() + d.slice(1)).join(' ');
+      return col;
+    });
 
   const tableBody = Table.append('tbody');
   for(let track of track_data) {
@@ -38,10 +43,19 @@ const trackList = (selection, track_data, page) => {
       .on("mouseout", function(_, d) {
         document.body.style.cursor = "default";
       });
-    column_show.forEach(d => 
+    column_show.forEach(d => {
+      let content = track[d];
+      if(d == "duration_ms") {
+        let time_s = +content.slice(0,-3);
+        let time_m = Math.floor(time_s/60);
+        time_s = time_s % 60;
+        content = `${time_m} min ${time_s} sec `
+      }
+
       row.append('td')
       .attr('class', `col-${d}`)
-      .text(track[d]));
+      .text(content)
+    });
   }
 
   jQuery(document).ready(function($) {
@@ -77,8 +91,11 @@ const pageBar = (track_data, page) => {
         let page_num = page+i-3;
         if(page < 3)
           page_num += 3-page;
-        else if(page > max_page-2)
+        else if(page > max_page-2) {
           page_num -= page-(max_page-2)
+          if(max_page < 5) 
+            page_num += 5-max_page
+        }
         d3.select(`#page${i}`)
           .select('a')
           .on('click', function() {
@@ -115,6 +132,7 @@ export const renderTrackList = (props) => {
   } = props;
   tracklist_data = props;
   d3.select('#plot').style('overflow-y', 'auto');
+  data.sort(function(a, b) { return b.popularity - a.popularity });
   let track_data = data.filter(d => d.track_name.toLowerCase()
     .includes(track_name.toLowerCase()));
   trackList(selection, track_data, page);

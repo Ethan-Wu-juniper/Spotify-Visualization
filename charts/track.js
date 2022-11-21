@@ -2,7 +2,7 @@ import { getElementSize, nonNumeric_col, float_col, clearWindow } from "../utils
 import { renderTrackList } from "./track_list.js";
 
 const spiderChart = (selection, track_data) => {
-  const height = 800;
+  const height = 780;
   const width = 1500;
 
   const svg = selection.selectAll('.svg-plot').data([null]);
